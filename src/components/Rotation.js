@@ -17,7 +17,7 @@ function Rotation({aircraftIndex, aircraftsList , onRemove, onRemoveAll}) {
                   <h3>{flight.ident}</h3>
                   <div className="sub-contents">
                     <div className="flight-row">
-                      <p>{flight.origin}</p> <span className="right-arrow">&#x1F82A;</span> <p>{flight.destination}</p>
+                      <p>{flight.origin}</p> <span className="right-arrow">&#10142;</span> <p>{flight.destination}</p>
                     </div>
                     <div className="flight-row">
                       <p>{flight.readable_departure}</p>

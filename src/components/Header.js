@@ -15,9 +15,9 @@ function Header() {
             <div><h2 className="title">AlphaFlights</h2></div>
         </div>
         <div className="display-date">
-            <button className="date-range">&#x2B9C;</button>
+            <button className="date-range left">&#10148;</button>
                 <h1>{getDate()}</h1>
-            <button className="date-range">&#x2B9E;</button>
+            <button className="date-range">&#10148;</button>
         </div>
         <div className="empty-space"></div>
     </div>
