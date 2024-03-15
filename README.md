@@ -26,3 +26,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 7. Scheduled time is shown in Green, Turnaround time is shown in purple and Idle time is shown in Gray.
 8. You can edit the rotation by clicking on the flight to remove it.
 9. Remove All Flights button removes all the flights from the Rotation.
+
+## Screenshot
+
+![AircraftScheduling!](public/screenshot.PNG)
