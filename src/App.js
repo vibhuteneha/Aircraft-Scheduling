@@ -1,23 +1,118 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useEffect, useRef, useState } from "react";
+import Aircrafts from "./components/Aircrafts";
+import Flights from "./components/Flights";
+import Header from "./components/Header";
+import Rotation from "./components/Rotation";
+import Modal from "./components/Modal";
 
 function App() {
+  const [aircraftsList, setAircraftsList] = useState([]);
+  const [flightsList, setFlightsList] = useState([]);
+  const [availableFlights, setAvailableFlights] = useState([]);
+  const [aircraftIndex, setAircraftIndex] = useState(null);
+  const modal = useRef();
+
+  useEffect(() => {
+    fetch("https://recruiting-assessment.alphasights.com/api/aircrafts")
+      .then((response) => response.json())
+      .then((data) => {
+        let aircrafts = data.map((aircraft) => {
+          aircraft.rotation = [];
+          aircraft.utilization = 0;
+          return aircraft;
+        });
+        setAircraftsList(aircrafts);
+      });
+
+    fetch("https://recruiting-assessment.alphasights.com/api/flights")
+      .then((response) => response.json())
+      .then((data) => {
+        let flights = data.map((flight) => {
+          flight.added_to_rotation = false;
+          return flight;
+        });
+
+        flights.sort((a, b) => a.departuretime - b.departuretime);
+
+        setFlightsList(flights);
+        setAvailableFlights(flights);
+      });
+  }, []);
+
+  function handleFlightSelect(flight) {
+    //Add flight to rotation
+    if(aircraftIndex === null) {
+      modal.current.open();
+      return;
+    }
+
+    const newAircraftsList = [...aircraftsList];
+    flight.added_to_rotation = true;
+    newAircraftsList[aircraftIndex].rotation.push(flight);
+    flightsForRotation(aircraftIndex);
+    setAircraftsList(newAircraftsList);
+  }
+
+  function handleAircraftSelect(aircraftId) {
+    //Select aircraft
+    const selectedAircraftIndex = aircraftsList.findIndex(
+      (aircraft) => aircraft.ident === aircraftId
+    );
+    flightsForRotation(selectedAircraftIndex);
+    setAircraftIndex(selectedAircraftIndex);
+  }
+
+  function handleFlightRemove(flight) {
+    //Remove flight from rotation
+    const newAircraftsList = [...aircraftsList];
+    newAircraftsList[aircraftIndex].rotation = newAircraftsList[aircraftIndex].rotation.filter(
+      (item) => item.ident !== flight.ident
+    );
+    flightsForRotation(aircraftIndex);
+    setAircraftsList(newAircraftsList);
+  }
+
+  function handleRemoveAllflights() {
+    //Remove all flights from rotation
+    const newAircraftsList = [...aircraftsList];
+    newAircraftsList[aircraftIndex].rotation = [];
+    flightsForRotation(aircraftIndex);
+    setAircraftsList(newAircraftsList);
+  }
+
+
+  function flightsForRotation(aircraftIndex) {
+    //Get flights for rotation
+    let allFlights = [...flightsList];
+    let filteredFlights = [];
+    let rotation = aircraftsList[aircraftIndex].rotation;
+    if(aircraftIndex !== null && rotation.length > 0) {
+      const matchTime = rotation[rotation.length - 1].arrivaltime + 1200;  //adding 20 minutes of buffer time
+      const matchAirport = rotation[rotation.length - 1].destination; // destination of last flight in rotation
+      filteredFlights = allFlights.filter(flight => flight.departuretime >= matchTime && flight.origin === matchAirport && flight.arrivaltime < 86400); // making sure the flight is after the last flight in rotation and the flight is not after 12:00 AM
+
+      setAvailableFlights(filteredFlights);
+    } else {
+      setAvailableFlights(allFlights);
+    }  
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Modal ref={modal} />
+      <Header />
+      <div className="container">
+        <div className="aircrafts">
+          <Aircrafts onSelectAircraft={handleAircraftSelect} aircraftsList={aircraftsList} aircraftIndex={aircraftIndex} />
+        </div>
+        <div className="rotation">
+          <Rotation aircraftIndex={aircraftIndex} aircraftsList={aircraftsList} onRemove={handleFlightRemove} onRemoveAll={handleRemoveAllflights}/>
+        </div>
+        <div className="flights">
+         <Flights availableFlights={availableFlights} handleFlightSelect={handleFlightSelect} />
+        </div>
+      </div>
     </div>
   );
 }
