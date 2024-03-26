@@ -13,9 +13,9 @@ function App() {
   const [aircraftIndex, setAircraftIndex] = useState(null);
   const modal = useRef();
 
-  // Fetch data from API
+  // Fetch data from local Json file
   useEffect(() => {
-    fetch("https://recruiting-assessment.alphasights.com/api/aircrafts")
+    fetch("/aircrafts.json")
       .then((response) => response.json())
       .then((data) => {
         let aircrafts = data.map((aircraft) => {
@@ -25,7 +25,7 @@ function App() {
         setAircraftsList(aircrafts);
       });
 
-    fetch("https://recruiting-assessment.alphasights.com/api/flights")
+    fetch("/flights.json")
       .then((response) => response.json())
       .then((data) => {
         data.sort((a, b) => a.departuretime - b.departuretime);
