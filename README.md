@@ -4,6 +4,7 @@ This project was created using ReactJS.
 
 ## Demo
 
+Open [https://nehamiller-aircraft-scheduling.netlify.app/]
 
 ## To run this app
 

@@ -12,7 +12,7 @@ function Header() {
             <div>
                 <img src="../aircraft.png" alt="logo" />
             </div>
-            <div><h2 className="title">AlphaFlights</h2></div>
+            <div><h2 className="title">MillerFlights</h2></div>
         </div>
         <div className="display-date">
             <button className="date-range left">&#10148;</button>
