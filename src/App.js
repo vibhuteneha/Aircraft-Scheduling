@@ -13,13 +13,13 @@ function App() {
   const [aircraftIndex, setAircraftIndex] = useState(null);
   const modal = useRef();
 
+  // Fetch data from API
   useEffect(() => {
     fetch("https://recruiting-assessment.alphasights.com/api/aircrafts")
       .then((response) => response.json())
       .then((data) => {
         let aircrafts = data.map((aircraft) => {
           aircraft.rotation = [];
-          aircraft.utilization = 0;
           return aircraft;
         });
         setAircraftsList(aircrafts);
@@ -28,15 +28,9 @@ function App() {
     fetch("https://recruiting-assessment.alphasights.com/api/flights")
       .then((response) => response.json())
       .then((data) => {
-        let flights = data.map((flight) => {
-          flight.added_to_rotation = false;
-          return flight;
-        });
-
-        flights.sort((a, b) => a.departuretime - b.departuretime);
-
-        setFlightsList(flights);
-        setAvailableFlights(flights);
+        data.sort((a, b) => a.departuretime - b.departuretime);
+        setFlightsList(data);
+        setAvailableFlights(data);
       });
   }, []);
 
@@ -48,7 +42,6 @@ function App() {
     }
 
     const newAircraftsList = [...aircraftsList];
-    flight.added_to_rotation = true;
     newAircraftsList[aircraftIndex].rotation.push(flight);
     flightsForRotation(aircraftIndex);
     setAircraftsList(newAircraftsList);
@@ -66,9 +59,16 @@ function App() {
   function handleFlightRemove(flight) {
     //Remove flight from rotation
     const newAircraftsList = [...aircraftsList];
-    newAircraftsList[aircraftIndex].rotation = newAircraftsList[aircraftIndex].rotation.filter(
-      (item) => item.ident !== flight.ident
-    );
+
+    let index = newAircraftsList[aircraftIndex].rotation.indexOf(flight);
+
+    if(newAircraftsList[aircraftIndex].rotation.length - 1 > index) {
+      newAircraftsList[aircraftIndex].rotation.splice(index);
+    } else {
+      newAircraftsList[aircraftIndex].rotation = newAircraftsList[aircraftIndex].rotation.filter(
+        (item) => item.ident !== flight.ident
+      );
+    }
     flightsForRotation(aircraftIndex);
     setAircraftsList(newAircraftsList);
   }
